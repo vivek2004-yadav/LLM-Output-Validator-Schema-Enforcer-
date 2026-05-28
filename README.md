@@ -11,32 +11,6 @@ A lightweight, high-performance Node.js developer utility that guarantees struct
 *   **State Machine Retrier**: Intercepts AI responses, cleans markdown blocks (` ```json `), runs Zod validation, and executes auto-retries on validation errors.
 *   **Minimal Developer UI**: A clean, single-page, light-theme portal to visually test playgrounds, manage template schemas, and review telemetry diagnostics.
 
----
-
-## ⚡ Setup & Quickstart
-
-### 1. Start the Server
-Run the following commands in your project root folder:
-```bash
-# Install packages
-npm install
-
-# Start the application
-npm start
-```
-The server will initialize the SQLite database tables, seed default schemas, and bind to:
-**[http://localhost:3000](http://localhost:3000)**
-
-### 2. Supply API Credentials (Optional)
-If you wish to test with production AI models, configure your credentials inside the `.env` file in the root directory:
-```env
-PORT=3000
-NODE_ENV=development
-DATABASE_PATH=./data/database.sqlite
-GEMINI_API_KEY=your_gemini_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
-```
-*(If left blank, the built-in Local Simulator will automatically generate mock formatting errors on Attempt 1 and resolve them on Attempt 2, allowing 100% of the validation and correction workflows to be tested offline without API keys!)*
 
 ---
 
