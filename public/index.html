@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Output Validator & Schema Enforcer</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <header class="header">
+      <h1>LLM Output Validator & Schema Enforcer</h1>
+      <p>A simple developer utility to register schemas and test structured LLM validation retries.</p>
+    </header>
+
+    <nav class="navigation">
+      <button class="nav-btn active" data-tab="playground">Test Playground</button>
+      <button class="nav-btn" data-tab="schemas">Registered Schemas</button>
+      <button class="nav-btn" data-tab="logs">Logs & Metrics</button>
+    </nav>
+
+    <main id="playground" class="tab-content active">
+      <div class="split-layout">
+
+        <div class="form-card">
+          <h2>Execution Settings</h2>
+          <form id="playground-call-form">
+            <div class="form-group">
+              <label for="play-schema-select">Select Target Schema</label>
+              <select id="play-schema-select" required></select>
+            </div>
+            
+            <div class="form-group">
+              <label for="play-provider-select">LLM Provider</label>
+              <select id="play-provider-select" required>
+                <option value="mock" selected>Local Simulator (Offline Testing)</option>
+                <option value="gemini">Google Gemini API</option>
+                <option value="openai">OpenAI API</option>
+              </select>
+            </div>
+            
+            <div class="form-group hidden" id="api-key-container">
+              <label for="play-apikey-input">API Key (Optional)</label>
+              <input type="password" id="play-apikey-input" placeholder="Paste custom API key if not set in .env...">
+            </div>
+            
+            <div class="form-group">
+              <label for="play-strategy-select">Injection Strategy</label>
+              <select id="play-strategy-select" required>
+                <option value="json_instruction" selected>Strict JSON Instruction</option>
+                <option value="few_shot">Few-Shot Example</option>
+                <option value="function_calling">Native Function Calling</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="play-prompt-input">Input Text / Prompt</label>
+              <textarea id="play-prompt-input" rows="5" placeholder="e.g. Extract user profile for Sarah Connor, aged 29, email sarah.c@cyberdyne.com. She is skilled in Node.js and SQLite." required></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="play-variables-input">Variables (Optional JSON map)</label>
+              <textarea id="play-variables-input" rows="2" class="code-font" placeholder='{ "variableName": "Value" }'></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="btn-execute-call">Run Validated Completion</button>
+          </form>
+        </div>
+
+        <div class="output-card">
+          <h2>Validation Trace Logs</h2>
+          <div id="trace-viewport-container" class="terminal-box">
+            <div class="empty-state">
+              Configure parameters on the left and click execute to run validation checks.
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+
+    <main id="schemas" class="tab-content">
+      <div class="split-layout">
+
+        <div class="list-card">
+          <h2>Active Schemas</h2>
+          <div id="schemas-list-container" class="schemas-scroll-container">
+            
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h2>Register New Schema</h2>
+          <form id="schema-registration-form">
+            <div class="form-group">
+              <label for="new-schema-name">Schema Name</label>
+              <input type="text" id="new-schema-name" placeholder="e.g. User Profile" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="new-schema-desc">Description</label>
+              <input type="text" id="new-schema-desc" placeholder="What does this schema validate?">
+            </div>
+            
+            <div class="form-group">
+              <label for="raw-json-textarea">Schema Definition (JSON Schema format)</label>
+              <textarea id="raw-json-textarea" class="code-font" rows="12" placeholder='{
+  "type": "object",
+  "properties": {
+    "username": { "type": "string", "constraints": { "min": 3 } },
+    "email": { "type": "string", "constraints": { "format": "email" } },
+    "age": { "type": "number", "constraints": { "min": 18 } }
+  }
+}' required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Compile & Register Schema</button>
+          </form>
+        </div>
+        
+      </div>
+    </main>
+
+    <main id="logs" class="tab-content">
+      <div class="split-layout">
+
+        <div class="form-card">
+          <h2>Telemetry Metrics</h2>
+          <div class="metrics-list">
+            <div class="metric-item">
+              <span class="metric-label">Total Validated Calls</span>
+              <span class="metric-value" id="stat-total-calls">0</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Conformity Success Rate</span>
+              <span class="metric-value" id="stat-success-rate">0%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Average Response Latency</span>
+              <span class="metric-value" id="stat-avg-latency">0 ms</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <h2>Failed Prompts Diagnostics</h2>
+          <div class="table-scroll">
+            <table class="simple-table">
+              <thead>
+                <tr>
+                  <th>Schema</th>
+                  <th>Failed Prompt</th>
+                  <th>Runs</th>
+                  <th>Common Error Issue</th>
+                </tr>
+              </thead>
+              <tbody id="failures-analytics-body">
+                <tr>
+                  <td colspan="4" class="empty-state">No log traces recorded yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

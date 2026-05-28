@@ -1,0 +1,30 @@
+{
+  "name": "typecast-ai",
+  "version": "1.0.0",
+  "description": "An elite Node.js + Express middleware & dashboard layer that validates and enforces LLM schemas with auto-retry correction.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "llm",
+    "zod",
+    "schema-validation",
+    "prompt-engineering",
+    "sqlite"
+  ],
+  "author": "Placement Candidate",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1",
+    "zod": "^3.23.8"
+  }
+}
