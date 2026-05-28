@@ -4,7 +4,7 @@ A lightweight, high-performance Node.js developer utility that guarantees struct
 
 ---
 
-## 🛠️ System Architecture
+##  System Architecture
 
 *   **Database Layer**: Powered by SQLite with a transparent, offline JSON flat-file database fallback to ensure zero native binary compilation crashes on different developer environments.
 *   **Dynamic Zod Compiler**: Translates visual JSON schema templates into live Zod validator chains in real-time.
@@ -14,12 +14,12 @@ A lightweight, high-performance Node.js developer utility that guarantees struct
 
 ---
 
-## 📝 Design & Telemetry Documentation
+##  Design & Telemetry Documentation
 
 ### 1. Correction Prompt Design
 When Zod captures a validation error (e.g. key `age` expected a number but received the string `'twenty-five'`), it isolates the exact property path and issue. The enforcer converts these details into a clean diagnostic log and feeds it back to the LLM using this strict, pattern-conforming template:
 
-> *'Your previous response failed validation with this error: [error]. The expected schema is: [schema]. Please try again and return only valid JSON.'*
+ *'Your previous response failed validation with this error: [error]. The expected schema is: [schema]. Please try again and return only valid JSON.'*
 
 By highlighting the specific property path and Zod error, the LLM receives precise programmatic feedback rather than generic warning commands, achieving vastly superior correction rates.
 
@@ -39,7 +39,7 @@ If an execution crashes after 3 attempts, it is flagged as `success = 0`. Our `G
 
 ---
 
-## 🌟 Reflection & Technical Takeaways
+##  Reflection & Technical Takeaways
 
 ### A. Which types of schemas are hardest to enforce reliably?
 The hardest schemas to validate are those with **highly nested object structures containing strict range constraints (min/max) and regex pattern validations**. 
