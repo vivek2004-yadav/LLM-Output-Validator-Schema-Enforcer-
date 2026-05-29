@@ -179,6 +179,7 @@ ${schemaString}
         model,
         systemPrompt,
         userPrompt: activePrompt,
+        originalPrompt: resolvedPrompt,
         schemaDef: definition,
         attemptCount: currentAttempt,
         apiKey

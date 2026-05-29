@@ -96,17 +96,21 @@ async function callGemini(model, systemPrompt, userPrompt, apiKey) {
   };
 }
 
-async function callMockEngine(schemaDef, systemPrompt, userPrompt, attemptCount) {
+async function callMockEngine(schemaDef, systemPrompt, userPrompt, attemptCount, originalPrompt = null) {
   
   await new Promise(resolve => setTimeout(resolve, 800));
 
   const cleanExample = generateFewShotExample(schemaDef);
-  const hasHardFailKeyword = userPrompt.toLowerCase().includes('hard-fail') || systemPrompt.toLowerCase().includes('hard-fail');
+  const promptToSearch = originalPrompt || userPrompt;
+  const hasHardFailKeyword = promptToSearch.toLowerCase().includes('hard-fail') || systemPrompt.toLowerCase().includes('hard-fail');
   const isCorrectionAttempt = userPrompt.includes('Your previous response failed validation');
 
   let textResponse = '';
 
-  if (!isCorrectionAttempt && attemptCount === 1) {
+  if (hasHardFailKeyword) {
+    textResponse = `{"error": "This is a forced mock hard failure simulation.", "prompt": "${userPrompt.substring(0, 30)}..."}`;
+  }
+  else if (!isCorrectionAttempt && attemptCount === 1) {
     
     const errorType = Math.floor(Math.random() * 3);
 
@@ -154,10 +158,6 @@ Let me know if you need anything else!`;
     }
   } 
   
-  else if (hasHardFailKeyword) {
-    textResponse = `{"error": "This is a forced mock hard failure simulation.", "prompt": "${userPrompt.substring(0, 30)}..."}`;
-  } 
-  
   else {
     textResponse = JSON.stringify(cleanExample, null, 2);
   }
@@ -175,7 +175,7 @@ Let me know if you need anything else!`;
   };
 }
 
-async function callLLM({ provider, model, systemPrompt, userPrompt, schemaDef, attemptCount = 1, apiKey = null }) {
+async function callLLM({ provider, model, systemPrompt, userPrompt, originalPrompt, schemaDef, attemptCount = 1, apiKey = null }) {
   console.log(`[LLM Call] Dispatching to ${provider} (${model || 'default'}). Attempt: ${attemptCount}`);
   
   const start = Date.now();
@@ -188,7 +188,7 @@ async function callLLM({ provider, model, systemPrompt, userPrompt, schemaDef, a
       result = await callOpenAI(model, systemPrompt, userPrompt, apiKey);
     } else {
       
-      result = await callMockEngine(schemaDef, systemPrompt, userPrompt, attemptCount);
+      result = await callMockEngine(schemaDef, systemPrompt, userPrompt, attemptCount, originalPrompt);
     }
 
     const latency = Date.now() - start;
